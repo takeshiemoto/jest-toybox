@@ -1,33 +1,30 @@
-import { decrement, increment, sayHello, sum } from "./index";
+import { createDBRecords, DBRecord } from "./index";
+import crypto from "crypto";
 
-beforeEach(() => {
-  console.log("beforeEach");
-});
+describe("Test", () => {
+  const channels = ["#channel1", "#channel2", "#channel3"];
+  let hash: string;
+  let records: DBRecord;
 
-afterEach(() => {
-  console.log("afterEach");
-});
+  beforeEach(() => {
+    hash = crypto.randomUUID();
+    records = createDBRecords(channels, hash);
+  });
 
-beforeAll(() => {
-  console.log("beforeAll");
-});
+  it("generates records", () => {
+    const recordKeys = Object.keys(records);
+    expect(recordKeys.length).toBe(channels.length);
+  });
 
-afterAll(() => {
-  console.log("afterAll");
-});
+  it("has correct channel names", () => {
+    const actualChannels = Object.values(records).map(
+      (record) => record.channel,
+    );
+    expect(actualChannels).toEqual(channels);
+  });
 
-test("say hello", () => {
-  expect(sayHello()).toBe("Hello!");
-});
-
-test("sum", () => {
-  expect(sum(1, 2)).toBe(3);
-});
-
-test("increment", () => {
-  expect(increment(1)).toBe(2);
-});
-
-test("decrement", () => {
-  expect(decrement(1)).toBe(0);
+  it("has correct hash value", () => {
+    const hashes = Object.values(records).map((record) => record.hash);
+    expect(hashes).toEqual(Array(channels.length).fill(hash));
+  });
 });
